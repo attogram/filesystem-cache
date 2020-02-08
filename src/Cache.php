@@ -1,7 +1,7 @@
 <?php
 /**
  * filesystem-cache
- * 
+ *
  * @author Attogram Project <https://github.com/attogram>
  * @license MIT
  * @see <https://github.com/attogram/filesystem-cache>
@@ -11,17 +11,14 @@ declare(strict_types = 1);
 namespace Attogram\Filesystem;
 
 use function array_pop;
-//use function count;
 use function explode;
 use function file_exists;
 use function file_get_contents;
 use function file_put_contents;
 use function filemtime;
 use function htmlentities;
-//use function is_array;
 use function is_dir;
 use function is_readable;
-//use function json_decode;
 use function md5;
 use function mkdir;
 use function print_r;
@@ -34,7 +31,7 @@ class Cache
     /**
      * @var string
      */
-    const VERSION = '0.0.4';
+    const VERSION = '0.1.0';
 
     /**
      * @var bool $verbose
@@ -45,6 +42,11 @@ class Cache
      * @var string $cacheDirectory - cache directory, with trailing slash
      */
     private $cacheDirectory = 'cache' . DIRECTORY_SEPARATOR;
+
+    /**
+     * @var string $filename - active filename, full path
+     */
+    private $filename;
 
     /**
      * @param string $cacheDirectory (optional, default '')
@@ -63,27 +65,23 @@ class Cache
     }
 
     /**
+     * Does a cached file exist for this key?
+     * - also sets $this->filename via setFilename()
+     *
      * @param string $key
      * @return bool
      */
     public function exists(string $key): bool
     {
-        $file = $this->getFilename($key);
-        if (empty($file)) {
-            return false;
+        if ($this->setFilename($key)
+            && file_exists($this->filename) 
+            && is_readable($this->filename)
+        ) {
+            return true;
         }
-        if (!file_exists($file)) {
-            $this->verbose('exists: File Does Not Exist: ' . $key);
+        $this->verbose('exists: File Does Not Exist, or Not Readable: key=' . $key);
     
-            return false;
-        }
-        if (!is_readable($file)) {
-            $this->error('exists: NOT READABLE: ' . $file);
-
-            return false;
-        }
-
-        return true;
+        return false;
     }
 
     /**
@@ -95,29 +93,15 @@ class Cache
         if (!$this->exists($key)) {
             return false;
         }
-        $file = $this->getFilename($key);
-        if (empty($file)) {
-            return false;
-        }
-        $contents = @file_get_contents($file);
+        $contents = @file_get_contents($this->filename);
         if (empty($contents)) {
-            $this->error("get: NO CONTENTS: $key - $file");
+            $this->error("get: NO CONTENTS: $key - " . $this->filename);
 
             return false;
         }
-        $this->verbose("get: key:$key - strlen.contents:" . strlen($contents) . " - file:$file");
+        $this->verbose("get: key:$key - strlen.contents:" . strlen($contents) . " - file:" . $this->filename);
 
         return $contents;
-
-        //$data = @json_decode($contents, true);
-        //if (!is_array($data)) {
-        //    $this->error("get: JSON DECODE FAILED: $key - $file");
-        //
-        //    return false;
-        //}
-        //$this->verbose("get: $key - " . count($data) . " - $file");
-        //
-        //return $data;
     }
 
     /**
@@ -127,8 +111,8 @@ class Cache
      */
     public function set(string $key, string $value): bool
     {
-        $file = $this->getFilename($key);
-        $parts = explode(DIRECTORY_SEPARATOR, $file);
+        $this->setFilename($key);
+        $parts = explode(DIRECTORY_SEPARATOR, $this->filename);
         array_pop($parts);
         $dir = '';
         foreach ($parts as $part) {
@@ -137,13 +121,13 @@ class Cache
                 mkdir($dir);
             }
         }
-        $bytes = file_put_contents($file, $value);
+        $bytes = file_put_contents($this->filename, $value);
         if (false === $bytes) {
-            $this->error('set: FAILED write path: ' . $file);
+            $this->error('set: FAILED write path: ' . $this->filename);
 
             return false;
         }
-        $this->verbose("set: key:$key - file:$file - bytes:$bytes");
+        $this->verbose("set: key:$key - file:" . $this->filename . " - bytes:$bytes");
 
         return true;
     }
@@ -157,15 +141,12 @@ class Cache
         if (!$this->exists($key)) {
             return false;
         }
-        $file = $this->getFilename($key);
-        if (!$file) {
-            return false;
-        }
-        if (!unlink($file)) {
+        if (!unlink($this->filename)) {
             $this->error('delete: unlink failed: ' . $key);
     
             return false;
         }
+
         return true;
     }
 
@@ -178,11 +159,7 @@ class Cache
         if (!$this->exists($key)) {
             return 0;
         }
-        $file = $this->getFilename($key);
-        if (!$file) {
-            return 0;
-        }
-        $age = filemtime($file);
+        $age = filemtime($this->filename);
         if (!is_int($age)) {
             $age = 0;
         }
@@ -191,31 +168,36 @@ class Cache
     }
 
     /**
+     * Set the filename from a key string
+     *
      * @param string $key
-     * @return string - full path to cache file, or empty string
+     * @return bool
      */
-    private function getFilename(string $key): string
+    private function setFilename(string $key): bool
     {
+        $this->filename = '';
         $md5 = md5($key);
         if (empty($md5)) {
             $this->error('getFilename: md5 failed: ' . $key);
 
-            return '';
+            return false;
         }
-        $first = substr($md5, 0, 1); // get first character
-        if (strlen($first) !== 1) {
+        $firstDirectory = substr($md5, 0, 1); // get first character
+        if (strlen($firstDirectory) !== 1) {
             $this->error('getFilename: 1st extract failed: ' . $key);
-
-            return '';
+    
+            return false;
         }
         $second = substr($md5, 1, 2); // get second and third character
         if (strlen($second) !== 2) {
             $this->error('getFilename: 2nd extract failed: ' . $key);
 
-            return '';
+            return false;
         }
-    
-        return $this->cacheDirectory . $first . DIRECTORY_SEPARATOR . $second . DIRECTORY_SEPARATOR . $md5 . '.gz';
+        $this->filename = $this->cacheDirectory . $firstDirectory . DIRECTORY_SEPARATOR
+            . $second . DIRECTORY_SEPARATOR . $md5 . '.cache';
+
+        return true;
     }
 
     /**

@@ -8,7 +8,7 @@ $cacheDirectory = 'cache' . DIRECTORY_SEPARATOR;
 $verbose = false;
 $key = 'test';
 $value = 'foobar';
-$value = json_encode(['foo' => 'bar']);
+//$value = json_encode(['foo' => 'bar']);
 
 
 $cache = new Cache($cacheDirectory, $verbose);
