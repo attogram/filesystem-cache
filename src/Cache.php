@@ -1,23 +1,27 @@
 <?php
 /**
- * filesystem-cache - https://github.com/attogram/filesystem-cache
+ * filesystem-cache
+ * 
+ * @author Attogram Project <https://github.com/attogram>
+ * @license MIT
+ * @see <https://github.com/attogram/filesystem-cache>
  */
 declare(strict_types = 1);
 
 namespace Attogram\Filesystem;
 
 use function array_pop;
-use function count;
+//use function count;
 use function explode;
 use function file_exists;
 use function file_get_contents;
 use function file_put_contents;
 use function filemtime;
 use function htmlentities;
-use function is_array;
+//use function is_array;
 use function is_dir;
 use function is_readable;
-use function json_decode;
+//use function json_decode;
 use function md5;
 use function mkdir;
 use function print_r;
@@ -30,7 +34,7 @@ class Cache
     /**
      * @var string
      */
-    const VERSION = '0.0.3';
+    const VERSION = '0.0.4';
 
     /**
      * @var bool $verbose
