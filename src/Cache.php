@@ -30,7 +30,7 @@ class Cache
     /**
      * @var string
      */
-    const VERSION = '0.0.2';
+    const VERSION = '0.0.3';
 
     /**
      * @var bool $verbose
@@ -40,7 +40,7 @@ class Cache
     /**
      * @var string $cacheDirectory - cache directory, with trailing slash
      */
-    private $cacheDirectory = '..' . DIRECTORY_SEPARATOR . 'cache' . DIRECTORY_SEPARATOR;
+    private $cacheDirectory = 'cache' . DIRECTORY_SEPARATOR;
 
     /**
      * @param string $cacheDirectory (optional, default '')
@@ -50,6 +50,7 @@ class Cache
     public function __construct(string $cacheDirectory = '', $verbose = false)
     {
         if ($cacheDirectory) {
+            // @TODO validate cacheDirectory format and existence
             $this->cacheDirectory = $cacheDirectory;
         }
         if ($verbose) {
@@ -65,11 +66,11 @@ class Cache
     {
         $file = $this->getFilename($key);
         if (empty($file)) {
-            $this->error('exists: EMPTY PATH: ' . $key);
-
             return false;
         }
         if (!file_exists($file)) {
+            $this->verbose('exists: File Does Not Exist: ' . $key);
+    
             return false;
         }
         if (!is_readable($file)) {
@@ -77,24 +78,21 @@ class Cache
 
             return false;
         }
+
         return true;
     }
 
     /**
      * @param string $key
-     * @return array|false
+     * @return mixed - contents of cached file, or false on error
      */
     public function get(string $key)
     {
         if (!$this->exists($key)) {
-            $this->verbose("get: NOT FOUND: $key");
-
             return false;
         }
         $file = $this->getFilename($key);
         if (empty($file)) {
-            $this->error("get: EMPTY PATH: $key - $file");
-
             return false;
         }
         $contents = @file_get_contents($file);
@@ -153,22 +151,18 @@ class Cache
     public function delete(string $key): bool
     {
         if (!$this->exists($key)) {
-            $this->error('delete: does not exist: ' . $key);
-
             return false;
         }
         $file = $this->getFilename($key);
         if (!$file) {
-            $this->error('delete: path empty: ' . $key);
-
             return false;
         }
-        if (unlink($file)) {
-            return true;
-        }
-        $this->error('delete: unlink failed');
+        if (!unlink($file)) {
+            $this->error('delete: unlink failed: ' . $key);
     
-        return false;
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -178,14 +172,10 @@ class Cache
     public function age(string $key): int
     {
         if (!$this->exists($key)) {
-            $this->verbose('age: NOT FOUND: ' . $key);
-
             return 0;
         }
         $file = $this->getFilename($key);
         if (!$file) {
-            $this->error('age: NO PATH: ' . $file);
-
             return 0;
         }
         $age = filemtime($file);
@@ -208,14 +198,14 @@ class Cache
 
             return '';
         }
-        $first = substr($md5, 0, 1);
-        if (!strlen($first)) {
+        $first = substr($md5, 0, 1); // get first character
+        if (strlen($first) !== 1) {
             $this->error('getFilename: 1st extract failed: ' . $key);
 
             return '';
         }
-        $second = substr($md5, 1, 2);
-        if (!strlen($second) == 2) {
+        $second = substr($md5, 1, 2); // get second and third character
+        if (strlen($second) !== 2) {
             $this->error('getFilename: 2nd extract failed: ' . $key);
 
             return '';

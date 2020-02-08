@@ -6,26 +6,34 @@ use Attogram\Filesystem\Cache;
 
 $cacheDirectory = 'cache' . DIRECTORY_SEPARATOR;
 $verbose = false;
+$key = 'test';
+$value = 'foobar';
+$value = json_encode(['foo' => 'bar']);
+
 
 $cache = new Cache($cacheDirectory, $verbose);
 
-var_dump($cache);
+print "Test: " . get_class($cache) . ' v' . $cache::VERSION . "\n";
 
-$key = 'test';
-$value = 'foobar';
+//var_dump($cache);
+printStats($key);
 
-print "-- exists($key) = "; var_dump($cache->exists($key));
-print "-- age($key) = "; var_dump($cache->age($key));
-print "-- get($key) = "; var_dump($cache->get($key));
+print "cache->set($key, $value) = ";
+var_dump($cache->set($key, $value));
+printStats($key);
 
-print "- set($key, $value) = "; var_dump($cache->set($key, $value));
+print "cache->delete($key) = ";
+var_dump($cache->delete($key));
+printStats($key);
 
-print "-- exists($key) = "; var_dump($cache->exists($key));
-print "-- age($key) = "; var_dump($cache->age($key));
-print "-- get($key) = "; var_dump($cache->get($key));
 
-print "- delete($key) = "; var_dump($cache->delete($key));
-
-print "-- exists($key) = "; var_dump($cache->exists($key));
-print "-- age($key) = "; var_dump($cache->age($key));
-print "-- get($key) = "; var_dump($cache->get($key));
+function printStats($key)
+{
+    global $cache;
+    print "-- cache->exists($key) = ";
+    var_dump($cache->exists($key));
+    print "-- cache->age($key) = ";
+    var_dump($cache->age($key));
+    print "-- cache->get($key) = ";
+    var_dump($cache->get($key));
+}
