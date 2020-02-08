@@ -33,7 +33,6 @@ $cache = new Cache($cacheDirectory);
 * <https://github.com/Wruczek/PHP-File-Cache>
 * <https://github.com/saltybeagle/StaticCache>
 * <https://github.com/sarahman/simple-filesystem-cache>
-* <https://github.com/middlewares/filesystem>
 * <https://github.com/chrisullyott/simple-cache>
 * <https://github.com/override2k/psr-cache>
 * ...

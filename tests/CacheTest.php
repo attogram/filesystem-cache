@@ -6,13 +6,47 @@ use Attogram\Filesystem\Cache;
 
 final class CacheTest extends TestCase
 {
-    public function getCache(): Cache
+    /**
+     * @var Attogram\Filesystem\Cache
+     */
+    protected $cache;
+
+    protected function setUp(): void
     {
-        return new Cache();
+        $this->cache = new Cache();
     }
 
     public function testClass(): void
     {
-        $this->assertInstanceOf(Cache::class, $this->getCache());
+        $this->assertInstanceOf(Cache::class, $this->cache);
+    }
+
+    public function testNonExistant(): void
+    {
+        $key = 'key-1';
+        $this->assertFalse($this->cache->exists($key));
+        $this->assertSame(0, $this->cache->age($key));
+        $this->assertFalse($this->cache->get($key));
+        $this->assertFalse($this->cache->delete($key));
+    }
+
+    public function testSet(): void
+    {
+        $key = 'key-2';
+        $value = 'foobar';
+        $this->assertTrue($this->cache->set($key, $value));
+        $this->assertTrue($this->cache->exists($key));
+        $this->assertIsInt($this->cache->age($key));
+        $this->assertSame($value, $this->cache->get($key));
+    }
+
+    public function testDelete(): void
+    {
+        $key = 'key-2';
+        $this->assertTrue($this->cache->exists($key));
+        $this->assertTrue($this->cache->delete($key));
+        $this->assertFalse($this->cache->exists($key));
+        $this->assertSame(0, $this->cache->age($key));
+        $this->assertFalse($this->cache->get($key));
     }
 }

@@ -1,5 +1,3 @@
 /tests/cache/
-/tests/.cache*
-/tests/.phpunit*
-/tests/phpunit*
+/tools/
 /vendor/
