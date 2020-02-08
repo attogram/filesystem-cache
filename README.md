@@ -2,7 +2,8 @@
 
 Filesystem-based cache system for PHP 7.
 
-Repository: <https://github.com/attogram/filesystem-cache>
+* Repository: <https://github.com/attogram/filesystem-cache>
+* Packagist: <https://packagist.org/packages/attogram/filesystem-cache>
 
 # Usage
 
@@ -20,7 +21,7 @@ $cache = new Cache($cacheDirectory);
 * public function get(string $key)
 * public function set(string $key, string $value): bool
 * public function delete(string $key): bool
-* public function age(string $key)
+* public function age(string $key): int
 
 
 # Similar projects:

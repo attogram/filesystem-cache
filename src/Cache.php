@@ -30,7 +30,7 @@ class Cache
     /**
      * @var string
      */
-    const VERSION = '0.0.1';
+    const VERSION = '0.0.2';
 
     /**
      * @var bool $verbose
@@ -44,12 +44,16 @@ class Cache
 
     /**
      * @param string $cacheDirectory (optional, default '')
+     * @param bool $verbose (optional, default false)
      * @return void
      */
-    public function __construct(string $cacheDirectory = '')
+    public function __construct(string $cacheDirectory = '', $verbose = false)
     {
         if ($cacheDirectory) {
             $this->cacheDirectory = $cacheDirectory;
+        }
+        if ($verbose) {
+            $this->verbose = true;
         }
     }
 
@@ -99,6 +103,7 @@ class Cache
 
             return false;
         }
+        $this->verbose("get: key:$key - strlen.contents:" . strlen($contents) . " - file:$file");
 
         return $contents;
 
@@ -136,7 +141,7 @@ class Cache
 
             return false;
         }
-        $this->verbose("set: $key - $file - $bytes");
+        $this->verbose("set: key:$key - file:$file - bytes:$bytes");
 
         return true;
     }
@@ -168,23 +173,27 @@ class Cache
 
     /**
      * @param string $key
-     * @return int|false - unix time stamp, or false on error
+     * @return int - unix time stamp, or 0 on error
      */
-    public function age(string $key)
+    public function age(string $key): int
     {
         if (!$this->exists($key)) {
             $this->verbose('age: NOT FOUND: ' . $key);
 
-            return false;
+            return 0;
         }
         $file = $this->getFilename($key);
         if (!$file) {
             $this->error('age: NO PATH: ' . $file);
 
-            return false;
+            return 0;
+        }
+        $age = filemtime($file);
+        if (!is_int($age)) {
+            $age = 0;
         }
 
-        return filemtime($file);
+        return $age;
     }
 
     /**

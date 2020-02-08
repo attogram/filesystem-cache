@@ -4,7 +4,10 @@ require_once('../src/Cache.php');
 
 use Attogram\Filesystem\Cache;
 
-$cache = new Cache('../cache/');
+$cacheDirectory = 'cache' . DIRECTORY_SEPARATOR;
+$verbose = false;
+
+$cache = new Cache($cacheDirectory, $verbose);
 
 var_dump($cache);
 
