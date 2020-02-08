@@ -1,0 +1,11 @@
+{
+    "name": "attogram/filesystem-cache",
+    "description": "Filesystem-based cache system for PHP 7",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Attogram\\Filesystem\\": "src/"
+        }
+    }
+}
