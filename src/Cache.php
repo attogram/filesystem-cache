@@ -31,7 +31,7 @@ class Cache
     /**
      * @var string
      */
-    const VERSION = '0.1.0';
+    const VERSION = '0.1.1';
 
     /**
      * @var bool $verbose
@@ -74,7 +74,7 @@ class Cache
     public function exists(string $key): bool
     {
         if ($this->setFilename($key)
-            && file_exists($this->filename) 
+            && file_exists($this->filename)
             && is_readable($this->filename)
         ) {
             return true;
@@ -188,14 +188,14 @@ class Cache
     
             return false;
         }
-        $second = substr($md5, 1, 2); // get second and third character
-        if (strlen($second) !== 2) {
+        $secondDirectory = substr($md5, 1, 2); // get second and third character
+        if (strlen($secondDirectory) !== 2) {
             $this->error('getFilename: 2nd extract failed: ' . $key);
 
             return false;
         }
         $this->filename = $this->cacheDirectory . $firstDirectory . DIRECTORY_SEPARATOR
-            . $second . DIRECTORY_SEPARATOR . $md5 . '.cache';
+            . $secondDirectory . DIRECTORY_SEPARATOR . $md5 . '.cache';
 
         return true;
     }

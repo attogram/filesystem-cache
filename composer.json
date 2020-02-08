@@ -3,6 +3,9 @@
     "description": "Filesystem-based cache system for PHP 7",
     "type": "library",
     "license": "MIT",
+    "require": {
+        "php": "^7"
+    },
     "autoload": {
         "psr-4": {
             "Attogram\\Filesystem\\": "src/"
