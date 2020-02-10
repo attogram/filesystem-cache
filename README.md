@@ -5,6 +5,7 @@ Filesystem-based cache system for PHP 7.
 * Repository: <https://github.com/attogram/filesystem-cache>
 * Packagist: <https://packagist.org/packages/attogram/filesystem-cache>
 * CodeClimate: <https://codeclimate.com/github/attogram/filesystem-cache>
+* Travis-CI: <https://travis-ci.org/attogram/filesystem-cache>
 
 ## Usage
 
