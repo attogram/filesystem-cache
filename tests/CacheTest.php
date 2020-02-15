@@ -11,7 +11,7 @@ final class CacheTest extends TestCase
      */
     protected $cache;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->cache = new Cache();
     }
@@ -36,7 +36,8 @@ final class CacheTest extends TestCase
         $value = 'foobar';
         $this->assertTrue($this->cache->set($key, $value));
         $this->assertTrue($this->cache->exists($key));
-        $this->assertIsInt($this->cache->age($key));
+        //$this->assertIsInt($this->cache->age($key));
+        $this->assertInternalType('int', $this->cache->age($key));
         $this->assertSame($value, $this->cache->get($key));
     }
 
