@@ -36,8 +36,12 @@ final class CacheTest extends TestCase
         $value = 'foobar';
         $this->assertTrue($this->cache->set($key, $value));
         $this->assertTrue($this->cache->exists($key));
-        //$this->assertIsInt($this->cache->age($key));
-        $this->assertInternalType('int', $this->cache->age($key));
+        if (method_exists($this, 'assertIsInt')) { // added in PHPUnit 8
+            $this->assertIsInt($this->cache->age($key));
+        }
+        if (method_exists($this, 'assertInternalType')) { // deprecated in PHPUnit 8, removed in PHPUnit 9
+            $this->assertInternalType('int', $this->cache->age($key)); 
+        }
         $this->assertSame($value, $this->cache->get($key));
     }
 
