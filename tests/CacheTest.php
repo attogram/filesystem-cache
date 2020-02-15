@@ -11,17 +11,17 @@ final class CacheTest extends TestCase
      */
     protected $cache;
 
-    protected function setUp(): void
+    protected function setUp()
     {
         $this->cache = new Cache();
     }
 
-    public function testClass(): void
+    public function testClass()
     {
         $this->assertInstanceOf(Cache::class, $this->cache);
     }
 
-    public function testNonExistant(): void
+    public function testNonExistant()
     {
         $key = 'key-1';
         $this->assertFalse($this->cache->exists($key));
@@ -30,7 +30,7 @@ final class CacheTest extends TestCase
         $this->assertFalse($this->cache->delete($key));
     }
 
-    public function testSet(): void
+    public function testSet()
     {
         $key = 'key-2';
         $value = 'foobar';
@@ -40,7 +40,7 @@ final class CacheTest extends TestCase
         $this->assertSame($value, $this->cache->get($key));
     }
 
-    public function testDelete(): void
+    public function testDelete()
     {
         $key = 'key-2';
         $this->assertTrue($this->cache->exists($key));
