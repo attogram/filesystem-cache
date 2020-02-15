@@ -4,12 +4,12 @@ Filesystem-based cache system for PHP 7.
 
 * Repository: <https://github.com/attogram/filesystem-cache>
 * Packagist: <https://packagist.org/packages/attogram/filesystem-cache>
-* CodeClimate: <https://codeclimate.com/github/attogram/filesystem-cache>
-* Travis-CI: <https://travis-ci.org/attogram/filesystem-cache>
+* CodeClimate: [![Maintainability](https://api.codeclimate.com/v1/badges/74acc2c81db24cc8fb75/maintainability)](https://codeclimate.com/github/attogram/filesystem-cache/maintainability)
+* Travis-CI: [![Build Status](https://travis-ci.org/attogram/filesystem-cache.svg?branch=master)](https://travis-ci.org/attogram/filesystem-cache)
 
 ## Usage
 
-```
+```php
 use Attogram\Filesystem\Cache;
 
 $cacheDirectory = '../cache/'; // must include trailing slash
